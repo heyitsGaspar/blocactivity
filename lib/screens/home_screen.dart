@@ -12,9 +12,19 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  final ActivityBloc _activityBloc = ActivityBloc();
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  late ActivityBloc _activityBloc;
 
+  // final ActivityBloc _activityBloc = ActivityBloc();
+
+
+   @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+    _activityBloc = BlocProvider.of<ActivityBloc>(context);
+  }
   // @override
   // void initState() {
   //   super.initState();
@@ -87,11 +97,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _activateActivity(Activity activity) {
+    // BlocProvider.of<ActivityBloc>(context).add(ActivateActivity(activity));
+    // _tabController.animateTo(1); // Cambiar a la pestaña "Activas"
     _activityBloc.add(ActivateActivity(activity));
-    TabController? tabController = DefaultTabController.of(context);
-    if (tabController != null) {
-      tabController.index = 1; // Índice 1 corresponde a la pestaña de "Activas"
-    }
+
+    setState(() {
+      _tabController.index = 1;
+    });
 
   }
 
@@ -151,6 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
 
+  
   Widget _buildAllActivitiesTab(BuildContext context) {
     return BlocBuilder<ActivityBloc, ActivityState>(
       bloc: _activityBloc,
@@ -160,20 +173,34 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // Widget _buildActiveActivitiesTab(BuildContext context) {
+  //   return BlocBuilder<ActivityBloc, ActivityState>(
+  //     bloc: _activityBloc,
+  //     builder: (context, state) {
+  //       if (state is ActiveActivitiesLoaded) {
+  //         final activeActivities =
+  //             state.activities.where((activity) => activity.isActive).toList();
+  //         return _buildActivityList(activeActivities);
+  //       }
+
+  //       return Container();
+  //     },
+  //   );
+  // }
+
+
   Widget _buildActiveActivitiesTab(BuildContext context) {
     return BlocBuilder<ActivityBloc, ActivityState>(
-      bloc: _activityBloc,
       builder: (context, state) {
-        if (state is ActiveActivitiesLoaded) {
-          final activeActivities =
-              state.activities.where((activity) => activity.isActive).toList();
-          return _buildActivityList(activeActivities);
+        if (state is AllActivitiesLoaded) {
+          return _buildActivityList(state.activities);
         }
 
         return Container();
       },
     );
   }
+
 
   Widget _buildFinishedActivitiesTab(BuildContext context) {
     return BlocBuilder<ActivityBloc, ActivityState>(
@@ -192,33 +219,39 @@ class _HomeScreenState extends State<HomeScreen> {
   }
  @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Actividades'),
-          bottom: TabBar(
-            tabs: [
-              Tab(text: 'Todas'),
-              Tab(text: 'Activas'),
-              Tab(text: 'Finalizadas'),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          children: [
-            _buildAllActivitiesTab(context),
-            _buildActiveActivitiesTab(context),
-            _buildFinishedActivitiesTab(context)
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Actividades'),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'Todas'),
+            Tab(text: 'Activas'),
+            Tab(text: 'Finalizadas'),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _addActivity(context),
-          child: Icon(Icons.add),
-        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildAllActivitiesTab(context),
+          _buildActiveActivitiesTab(context),
+          _buildFinishedActivitiesTab(context),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _addActivity(context),
+        child: const Icon(Icons.add),
       ),
     );
   }
 
-  
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 }
+
+  
+
