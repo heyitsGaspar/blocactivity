@@ -20,14 +20,9 @@ class ActivateActivity extends ActivityEvent {
   ActivateActivity(this.activity);
 }
 
-class FinishActivity extends ActivityEvent {
+class FinishActivity extends ActivityEvent{
   final Activity activity;
 
   FinishActivity(this.activity);
 }
 
-// class LoadAllActivities extends ActivityEvent {}
-
-// class LoadActiveActivities extends ActivityEvent {}
-
-// class LoadFinishedActivities extends ActivityEvent {}

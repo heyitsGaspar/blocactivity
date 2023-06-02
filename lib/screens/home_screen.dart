@@ -16,25 +16,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   late TabController _tabController;
   late ActivityBloc _activityBloc;
 
-  // final ActivityBloc _activityBloc = ActivityBloc();
-
-
    @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _activityBloc = BlocProvider.of<ActivityBloc>(context);
   }
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _activityBloc.add(LoadAllActivities());
-  // }
-
-
-
-  
-
+ 
   void _addActivity(BuildContext context) {
     showDialog(
       context: context,
@@ -88,10 +76,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-  
- 
-
-
   void _deleteActivity(Activity activity) {
     _activityBloc.add(DeleteActivity(activity));
   }
@@ -101,16 +85,16 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     // _tabController.animateTo(1); // Cambiar a la pestaña "Activas"
     _activityBloc.add(ActivateActivity(activity));
 
-    setState(() {
-      _tabController.index = 1;
-    });
+    
 
   }
 
   void _finishActivity(Activity activity) {
     _activityBloc.add(FinishActivity(activity));
+
+    
   }
-  
+
 
   Widget _buildActivityList(List<Activity> activities) {
     return ListView.builder(
@@ -173,20 +157,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-  // Widget _buildActiveActivitiesTab(BuildContext context) {
-  //   return BlocBuilder<ActivityBloc, ActivityState>(
-  //     bloc: _activityBloc,
-  //     builder: (context, state) {
-  //       if (state is ActiveActivitiesLoaded) {
-  //         final activeActivities =
-  //             state.activities.where((activity) => activity.isActive).toList();
-  //         return _buildActivityList(activeActivities);
-  //       }
 
-  //       return Container();
-  //     },
-  //   );
-  // }
 
 
   Widget _buildActiveActivitiesTab(BuildContext context) {
@@ -201,22 +172,24 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-
   Widget _buildFinishedActivitiesTab(BuildContext context) {
-    return BlocBuilder<ActivityBloc, ActivityState>(
-      bloc: _activityBloc,
-      builder: (context, state) {
-        if (state is FinishedActivitiesLoaded) {
-          final finishedActivities = state.activities
-              .where((activity) => activity.isFinished)
-              .toList();
-          return _buildActivityList(finishedActivities);
-        }
+  return BlocBuilder<ActivityBloc, ActivityState>(
+    builder: (context, state) {
+      if (state is FinishedActivitiesLoaded) {
+        final finishedActivities =
+            state.activities.where((activity) => activity.isFinished).toList();
+        return _buildActivityList(finishedActivities);
+      }
 
-        return Container();
-      },
-    );
-  }
+      return Container();
+    },
+  );
+}
+
+
+
+
+  
  @override
   Widget build(BuildContext context) {
     return Scaffold(

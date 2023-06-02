@@ -14,8 +14,9 @@ class ActiveActivitiesLoaded extends ActivityState {
   ActiveActivitiesLoaded(this.activities);
 }
 
-class FinishedActivitiesLoaded extends ActivityState {
+class FinishedActivitiesLoaded extends ActivityState{
   final List<Activity> activities;
+
 
   FinishedActivitiesLoaded(this.activities);
 }

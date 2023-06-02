@@ -9,6 +9,7 @@ class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
     on<AddActivity>(_onAddActivity);
     on<DeleteActivity>(_onDeleteActivity);
     on<ActivateActivity>(_onActivateActivity);
+    on<FinishActivity>(_onFinishActivity);
   }
 
   void _onAddActivity(AddActivity event, Emitter<ActivityState> emit) {
@@ -30,10 +31,7 @@ class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
     }
   }
 
-  void _onActivateActivity(
-    ActivateActivity event,
-    Emitter<ActivityState> emit,
-  ) {
+  void _onActivateActivity(ActivateActivity event, Emitter<ActivityState> emit) {
     final currentState = state;
 
     if (currentState is AllActivitiesLoaded) {
@@ -43,7 +41,24 @@ class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
       emit(AllActivitiesLoaded(updatedActivities));
     }
   }
+
+  void _onFinishActivity(FinishActivity event, Emitter<ActivityState> emit) {
+    final currentState = state;
+
+    if (currentState is AllActivitiesLoaded) {
+      final updatedActivities = currentState.activities
+          .map((a) => a == event.activity ? a.copyWith(isFinished: true) : a)
+          .toList();
+
+      emit(AllActivitiesLoaded(updatedActivities));
+
+      final finishedActivities =
+          updatedActivities.where((activity) => activity.isFinished).toList();
+      emit(FinishedActivitiesLoaded(finishedActivities));
+    }
+  }
 }
+
 
 
 
